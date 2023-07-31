@@ -1,0 +1,61 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "BBC BASIC",
+	"patterns": [
+		{
+			"include": "#linenumber"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#constants"
+		}
+	],
+	"repository": {
+		"linenumber": {
+			"patterns": [
+				{
+					"name": "entity.line-number.bbcbasic",
+					"match": "^ *[0-9]+ *"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"match": "(DEF *(?:PROC|FN)) *([@`A-Za-z_][@`A-Za-z_0-9]*)",
+					"captures": {
+						"1": {
+							"name": "storage.type.function.bbcbasic"
+						},
+						"2": {
+							"name": "entity.name.function.bbcbasic"
+						}
+					}
+				},
+				{
+					"name": "storage.type.function.bbcbasic",
+					"match": "(END *PROC)$"
+				},
+				{
+					"name": "storage.type.function.bbcbasic",
+					"match": "^ *="
+				},
+				{
+					"name": "keyword.contlol.flow.bbcbasic",
+					"match": "(IF|THEN|ELSE|ENDIF)"
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"name": "constant.numeric.bbcbasic",
+					"match": "([0-9]+)"
+				}
+			]			
+		}
+	},
+	"scopeName": "source.bbcbasic"
+}
