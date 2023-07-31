@@ -165,6 +165,7 @@ const tokens = [
 
 const byteCodeToToken: string[] = []
 const tokenCharsToBytes: any = {}
+const tokenSizes: number[] = []
 
 async function saveToBasic(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]) {
 	if (!checkFileExists(textEditor.document)) {
@@ -183,7 +184,6 @@ async function saveToBasic(textEditor: vscode.TextEditor, edit: vscode.TextEdito
 		// TODO
 		binaryData = resize(binaryData, bufferSize + len)
 		let subarray = bytes.subarray(0, len)
-		console.log(binaryData.length, subarray, len, bufferSize)
 		binaryData.set(subarray, bufferSize)
 		bufferSize += len
 	}
@@ -193,9 +193,8 @@ async function saveToBasic(textEditor: vscode.TextEditor, edit: vscode.TextEdito
 	binaryData[bufferSize + 1] = 0xff
 	
 	let binaryUri = getBinaryUri(textEditor.document.uri)
-	console.log(JSON.stringify(binaryData))
 	await vscode.workspace.fs.writeFile(binaryUri, binaryData)
-	console.log('Saved to BBCBasic format!')
+	vscode.window.showInformationMessage('Saved!')
 }
 
 function resize(array: Uint8Array, newSize: number) : Uint8Array {
@@ -214,7 +213,7 @@ async function loadFromBasic(textEditor: vscode.TextEditor, edit: vscode.TextEdi
 	let lines = readLines(data)
 	textEditor.edit(edit => {
 		edit.replace(new vscode.Range(0, 0, textEditor.document.lineCount, 0), lines.join('\n'))
-		console.log('Loaded from BBCBasic format!')
+		vscode.window.showInformationMessage('Loaded!')
 	})
 }
 
@@ -279,8 +278,11 @@ function tokenizeLine(line: string, lineNumber: number, target: Uint8Array, offs
 			table = tokenCharsToBytes
 			bytes.length = 0
 		}
-
 	}
+	for (let byte of bytes) {
+		target[targetCursor++] = byte
+	}
+
 	target[offset] = 0x0D
 	target[offset + 1] = lineNumber / 256
 	target[offset + 2] = lineNumber % 256
@@ -296,10 +298,11 @@ function detokenizeLine(line: Uint8Array, offset: number, len: number): string {
 		if (tokenIndex >= 0) {
 			let token = byteCodeToToken[tokenIndex]
 			out += token
+			cursor+= tokenSizes[tokenIndex]
 		} else {
 			out += String.fromCharCode(line[offset + cursor])
+			cursor++
 		}
-		cursor++
 	}
 	return out
 }
@@ -320,16 +323,6 @@ function getTextUri(binaryUri: vscode.Uri) {
 	let path = binaryUri.path.substring(0, binaryUri.path.lastIndexOf(','))
 	let textPath = path + '.bbc'
 	return vscode.Uri.file(textPath)
-}
-
-function printBytes(data: Uint8Array) {
-	for (let i = 0; i < data.length; i++) {
-		console.log(
-			data[i].toString().padStart(3, ' '),
-			data[i].toString(16).padStart(2, '0').toUpperCase(),
-			String.fromCharCode(data[i])
-		)
-	}
 }
 
 function checkFileExists(document: vscode.TextDocument): boolean {
@@ -359,8 +352,11 @@ function prepareConversionTables() {
 		// Bytes to token conversion table
 		// using clever packing of one or multiple bytes into a single index
 		byteCodeToToken[bytesToIndex(token.bytes)] = token.value
-		if (token.extraBytes) byteCodeToToken[bytesToIndex(token.extraBytes)] = token.value
-
+		tokenSizes[bytesToIndex(token.bytes)] = token.bytes.length
+		if (token.extraBytes) {
+			byteCodeToToken[bytesToIndex(token.extraBytes)] = token.value
+			tokenSizes[bytesToIndex(token.extraBytes)] = token.extraBytes.length
+		}
 		// Token to bytes conversion table
 		addTokenToTree(token.value, token.bytes)
 		if (token.extraValue) addTokenToTree(token.extraValue, token.bytes)
