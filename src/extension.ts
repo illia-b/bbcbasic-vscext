@@ -261,11 +261,13 @@ function tokenizeLine(line: string, lineNumber: number, target: Uint8Array, offs
 	let table = tokenCharsToBytes
 	let bytes: number[] = []
 	let nextChar
+	let isComment = false
+	let isString = false
 	while (lineCursor < len) {
 		nextChar = line.charAt(lineCursor++)
 		bytes.push(nextChar.charCodeAt(0))
-
-		if (table[nextChar]) {
+		let skipTokens = isComment || isString
+		if (!skipTokens && table[nextChar]) {
 			table = table[nextChar]
 			if(table['bytes']) {
 				// found a token
@@ -277,6 +279,12 @@ function tokenizeLine(line: string, lineNumber: number, target: Uint8Array, offs
 			}
 			table = tokenCharsToBytes
 			bytes.length = 0
+		}
+		if (nextChar === '"') {
+			isString = !isString
+		}
+		if (bytes[0] === 0xF4) {
+			isComment = true
 		}
 	}
 	for (let byte of bytes) {
