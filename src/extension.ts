@@ -36,7 +36,7 @@ const tokens = [
 	{ "value": "DRAW", "bytes": [223] }, 
 	{ "value": "EDIT", "bytes": [199, 146] }, 
 	{ "value": "ELLIPSE", "bytes": [200, 157] }, 
-	{ "value": "ELSE", "bytes": [139], "extraBytes": [204] }, 
+	{ "value": "ELSE", "bytes": [204], "extraBytes": [139] }, 
 	{ "value": "END", "bytes": [224] }, 
 	{ "value": "ENDCASE", "bytes": [203] }, 
 	{ "value": "ENDIF", "bytes": [205] }, 
