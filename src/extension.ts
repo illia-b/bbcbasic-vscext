@@ -167,7 +167,7 @@ const byteCodeToToken: string[] = []
 const tokenCharsToBytes: any = {}
 const tokenSizes: number[] = []
 
-async function saveToBasic(textEditor: vscode.TextEditor, edit: vscode.TextEditorEdit, args: any[]) {
+async function saveToBasic(textEditor: vscode.TextEditor, edit?: vscode.TextEditorEdit, args?: any[]) {
 	if (!checkFileExists(textEditor.document)) {
 		return
 	}
@@ -387,11 +387,23 @@ function addTokenToTree(token: string, bytes: number[]) {
 export function activate(context: vscode.ExtensionContext) {
 	prepareConversionTables()
 
-	context.subscriptions.push(vscode.commands.registerTextEditorCommand('bbcbasic.save', saveToBasic))
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand('vinca-dev.bbcbasic.save', saveToBasic))
 
-	context.subscriptions.push(vscode.commands.registerTextEditorCommand('bbcbasic.load', loadFromBasic))
+	context.subscriptions.push(vscode.commands.registerTextEditorCommand('vinca-dev.bbcbasic.load', loadFromBasic))
 
-	context.subscriptions.push(vscode.commands.registerCommand('bbcbasic.open', createFromBasic))
+	context.subscriptions.push(vscode.commands.registerCommand('vinca-dev.bbcbasic.open', createFromBasic))
+
+	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+		if (document.languageId === 'vinca-dev.bbcbasic') {
+			saveToBasic({document: document} as vscode.TextEditor)
+		}
+	}))
 }
 
-export function deactivate() { }
+export function deactivate() {
+	byteCodeToToken.length = 0
+	tokenSizes.length = 0
+	for (let key in tokenCharsToBytes) {
+		delete tokenCharsToBytes[key]
+	}
+ }
