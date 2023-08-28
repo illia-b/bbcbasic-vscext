@@ -7,7 +7,7 @@
     "url": "https://github.com/illia-b/bbcbasic-vscext"
   },
   "description": "",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.79.0",
     "node": ">=20.0.0"
@@ -20,30 +20,30 @@
   "contributes": {
     "commands": [
       {
-        "command": "bbcbasic.save",
+        "command": "vinca-dev.bbcbasic.save",
         "title": "Save to RISC OS File",
         "icon": "$(save)"
       },
       {
-        "command": "bbcbasic.load",
+        "command": "vinca-dev.bbcbasic.load",
         "title": "Reload from RISC OS File",
         "icon": "$(refresh)"
       },
       {
-        "command": "bbcbasic.open",
+        "command": "vinca-dev.bbcbasic.open",
         "title": "Open RISC OS File",
         "icon": "$(refresh)"
       }
     ],
     "languages": [{
-      "id": "bbcbasic",
+      "id": "vinca-dev.bbcbasic",
       "aliases": ["BBC Basic", "RISC OS BBC Basic", "bbcbasic"],
       "extensions": [".bbc",".bbcbasic",".basic"],
       "configuration": "./language-configuration.json"
     }],
     "grammars": [{
-      "language": "bbcbasic",
-      "scopeName": "source.bbcbasic",
+      "language": "vinca-dev.bbcbasic",
+      "scopeName": "source.vinca-dev.bbcbasic",
       "path": "./syntaxes/bbcbasic.tmLanguage.json"
     }],
     "semanticTokenModifiers": [{
@@ -53,19 +53,19 @@
     "menus": {
       "editor/title": [
         {
-          "command": "bbcbasic.save",
-          "when": "editorLangId == bbcbasic",
+          "command": "vinca-dev.bbcbasic.save",
+          "when": "editorLangId == vinca-dev.bbcbasic",
           "group": "navigation"
         },
         {
-          "command": "bbcbasic.load",
-          "when": "editorLangId == bbcbasic",
+          "command": "vinca-dev.bbcbasic.load",
+          "when": "editorLangId == vinca-dev.bbcbasic",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "command": "bbcbasic.open",
+          "command": "vinca-dev.bbcbasic.open",
           "when": "resourceFilename =~ /,ffb$/",
           "group": "2_workspace"
         }
